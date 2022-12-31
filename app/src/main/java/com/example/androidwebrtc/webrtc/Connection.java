@@ -10,13 +10,9 @@ import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
 import org.webrtc.Camera2Enumerator;
 import org.webrtc.CameraEnumerator;
-import org.webrtc.CameraVideoCapturer;
 import org.webrtc.DataChannel;
-import org.webrtc.DefaultVideoDecoderFactory;
-import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.EglBase;
 import org.webrtc.IceCandidate;
-import org.webrtc.IceCandidateErrorEvent;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.MediaStreamTrack;
@@ -24,7 +20,6 @@ import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.RendererCommon;
 import org.webrtc.RtpReceiver;
-import org.webrtc.RtpTransceiver;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 import org.webrtc.SoftwareVideoDecoderFactory;
@@ -38,9 +33,6 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
 import java.util.ArrayList;
-import java.util.concurrent.Future;
-
-import javax.microedition.khronos.egl.EGLContext;
 
 public class Connection implements PeerConnection.Observer {
     private static final String TAG = "Connection";
@@ -56,7 +48,6 @@ public class Connection implements PeerConnection.Observer {
 
     private static Connection INSTANCE = null;
     private final PeerConnectionFactory mFactory;
-    private final ArrayList<IceCandidate> mRemoteIceCandidates = new ArrayList<>();
     private PeerConnection mPeerConnection;
     private MediaStream mMediaStream;
     private VideoCapturer mVideoCapturer;
@@ -65,8 +56,6 @@ public class Connection implements PeerConnection.Observer {
     private Connection(final Context context, final ConnectionListener listener) {
         final PeerConnectionFactory.InitializationOptions options = PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions();
         final EglBase.Context eglContext = EglBase.create().getEglBaseContext();
-        //final VideoEncoderFactory encoderFactory = new DefaultVideoEncoderFactory(eglContext, true, false);
-        //final VideoDecoderFactory decoderFactory = new DefaultVideoDecoderFactory(eglContext);
         final VideoEncoderFactory encoderFactory = new SoftwareVideoEncoderFactory();
         final VideoDecoderFactory decoderFactory = new SoftwareVideoDecoderFactory();
 
@@ -85,15 +74,6 @@ public class Connection implements PeerConnection.Observer {
 
         INSTANCE = new Connection(context, listener);
         return INSTANCE;
-    }
-
-    public void startCall(final SdpObserver observer) {
-        final MediaConstraints mediaConstraints = new MediaConstraints();
-
-        mediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
-        mediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
-
-        mPeerConnection.createOffer(observer, mediaConstraints);
     }
 
     public void initializeMediaDevices(final Context context, final SurfaceViewRenderer localRenderer) throws Exception {
@@ -211,29 +191,6 @@ public class Connection implements PeerConnection.Observer {
         mPeerConnection.createAnswer(observer, mediaConstraints);
     }
 
-    public void setRemoteDescription(final String remoteOffer) {
-        final SessionDescription sessionDescription = new SessionDescription(SessionDescription.Type.ANSWER, remoteOffer);
-        final ArrayList<IceCandidate> candidates = mRemoteIceCandidates;
-
-        mPeerConnection.setRemoteDescription(new SdpObserver() {
-            @Override
-            public void onCreateSuccess(SessionDescription sessionDescription) { }
-
-            @Override
-            public void onSetSuccess() {
-                Log.d(TAG, "Set remote description success " + mRemoteIceCandidates.size());
-            }
-
-            @Override
-            public void onCreateFailure(String s) { }
-
-            @Override
-            public void onSetFailure(String s) {
-                Log.e(TAG, "Failed to set remote description error:" + s);
-            }
-        }, sessionDescription);
-    }
-
     public void addRemoteIceCandidate(final JSONObject iceCandidateData) throws JSONException {
         Log.d(TAG, "Check " + iceCandidateData.toString());
         final String sdpMid = iceCandidateData.getString("sdpMid");
@@ -279,18 +236,6 @@ public class Connection implements PeerConnection.Observer {
         }
 
         throw new Exception("Failed to get camera device");
-    }
-
-    private VideoCapturer getCameraCapturer(final CameraEnumerator cameraEnumerator) {
-        final String[] deviceNames = cameraEnumerator.getDeviceNames();
-
-        for (final String deviceName : deviceNames) {
-            if (cameraEnumerator.isFrontFacing(deviceName)) {
-                return cameraEnumerator.createCapturer(deviceName, null);
-            }
-        }
-
-        return null;
     }
 
     public void createPeerConnection() {

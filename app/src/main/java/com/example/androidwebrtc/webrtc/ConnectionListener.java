@@ -1,6 +1,5 @@
 package com.example.androidwebrtc.webrtc;
 
-import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStreamTrack;
 import org.webrtc.SessionDescription;

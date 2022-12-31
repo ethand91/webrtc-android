@@ -45,13 +45,13 @@
         android:visibility="invisible"
         />
 
-        <Button
-            android:id="@+id/logoutButton"
-            android:layout_width="200dp"
-            android:layout_height="100dp"
-            android:text="@string/logout_button"
-            android:visibility="invisible"
-            android:gravity="bottom"
-            android:layout_alignParentEnd="true"
-            />
+    <Button
+        android:id="@+id/logoutButton"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:text="@string/logout_button"
+        android:visibility="invisible"
+        android:gravity="bottom"
+        android:layout_alignParentEnd="true"
+        />
 </RelativeLayout>

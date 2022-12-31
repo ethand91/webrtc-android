@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
                             mCallButton.setEnabled(true);
                         }
                     });
-                    handleSocketOnOpen();
+                    requestCameraAndMicAccess();
                 }
 
                 @Override
@@ -167,10 +167,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         mLogoutButton.setVisibility(View.INVISIBLE);
     }
 
-    private void handleSocketOnOpen() {
-        requestCameraAndMicAccess();
-    }
-
     private SSLSocketFactory supportSelfSignedCert() throws NoSuchAlgorithmException, KeyManagementException {
         final TrustManager[] trustManagers = new TrustManager[] {
                 new X509TrustManager() {
@@ -215,11 +211,11 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
                    Log.d(TAG, "WebSocket::offer " + jsonMessage.getJSONObject("data"));
                    mRemoteId = jsonMessage.getJSONObject("data").getString("remoteId");
 
-                   initializePeerConnection(jsonMessage.getJSONObject("data").getJSONObject("offer").getString("sdp"));
+                   mConnection.createAnswerFromRemoteOffer(jsonMessage.getJSONObject("data").getJSONObject("offer").getString("name"));
                    break;
                case "answer":
                    Log.d(TAG, "WebSocket::answer");
-                   mConnection.setRemoteDescription(jsonMessage.getJSONObject("data").getJSONObject("answer").getString("sdp"));
+                   mConnection.createAnswerFromRemoteOffer(jsonMessage.getJSONObject("data").getJSONObject("answer").getString("sdp"));
                    break;
                case "iceCandidate":
                    Log.d(TAG, "WebSocket::iceCandidate " + jsonMessage.getJSONObject("data").getJSONObject("candidate").toString());
@@ -230,11 +226,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         } catch (JSONException je) {
             Log.e(TAG, "Failed to handle WebSocket message", je);
         }
-    }
-
-    private void initializePeerConnection(final String remoteOffer) {
-        //mConnection.createPeerConnection();
-        mConnection.createAnswerFromRemoteOffer(remoteOffer);
     }
 
     private void sendSocketMessage(final String action, final JSONObject data) {
