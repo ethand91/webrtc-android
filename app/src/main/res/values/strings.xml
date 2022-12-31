@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Android WebRTC</string>
+
+    <string name="peer_id_placeholder">Enter remote peer id</string>
+    <string name="call_button_text">Call</string>
+    <string name="request_camera_mic_permissions_text">Please allow access to your camera and mic.</string>
+    <string name="logout_button">Logout</string>
+</resources>

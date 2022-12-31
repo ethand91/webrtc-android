@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="20dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/peerIdEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/peer_id_placeholder"
+            android:autofillHints="test"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/callButton"
+            android:text="@string/call_button_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:enabled="false"/>
+
+    </LinearLayout>
+
+    <org.webrtc.SurfaceViewRenderer
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/localRenderer"
+        android:visibility="invisible"
+        />
+
+    <org.webrtc.SurfaceViewRenderer
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/remoteRenderer"
+        android:visibility="invisible"
+        />
+
+        <Button
+            android:id="@+id/logoutButton"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:text="@string/logout_button"
+            android:visibility="invisible"
+            android:gravity="bottom"
+            android:layout_alignParentEnd="true"
+            />
+</RelativeLayout>
